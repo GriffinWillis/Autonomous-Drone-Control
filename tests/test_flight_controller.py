@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from mavsdk.telemetry import LandedState
 
 from app.flight_controller import TAKEOFF_ALTITUDE_M, FlightController
 
@@ -20,13 +21,18 @@ def mock_drone() -> MagicMock:
     drone.action.set_takeoff_altitude = AsyncMock()
     drone.action.takeoff = AsyncMock()
     drone.action.land = AsyncMock()
+    drone.action.disarm = AsyncMock()
 
     async def _position() -> object:
         pos = MagicMock()
-        pos.relative_altitude_m = -TAKEOFF_ALTITUDE_M
+        pos.relative_altitude_m = TAKEOFF_ALTITUDE_M
         yield pos
 
+    async def _landed_state() -> object:
+        yield LandedState.ON_GROUND
+
     drone.telemetry.position = _position
+    drone.telemetry.landed_state = _landed_state
     return drone
 
 
@@ -59,7 +65,28 @@ async def test_land_calls_mavsdk(mock_drone: MagicMock) -> None:
     mock_drone.action.land.assert_awaited_once()
 
 
+async def test_wait_for_landed_returns_on_ground(mock_drone: MagicMock) -> None:
+    with patch("app.flight_controller.System", return_value=mock_drone):
+        fc = FlightController()
+        await fc.wait_for_landed()
+
+
+async def test_disarm_calls_mavsdk(mock_drone: MagicMock) -> None:
+    with patch("app.flight_controller.System", return_value=mock_drone):
+        fc = FlightController()
+        await fc.disarm()
+    mock_drone.action.disarm.assert_awaited_once()
+
+
 async def test_demo_flight_sequence(mock_drone: MagicMock) -> None:
+    async def _health() -> object:
+        h = MagicMock()
+        h.is_global_position_ok = True
+        h.is_home_position_ok = True
+        yield h
+
+    mock_drone.telemetry.health = _health
+
     with (
         patch("app.flight_controller.System", return_value=mock_drone),
         patch("app.flight_controller.HOLD_SECONDS", 0),
@@ -71,3 +98,4 @@ async def test_demo_flight_sequence(mock_drone: MagicMock) -> None:
     mock_drone.action.arm.assert_awaited_once()
     mock_drone.action.takeoff.assert_awaited_once()
     mock_drone.action.land.assert_awaited_once()
+    mock_drone.action.disarm.assert_awaited_once()

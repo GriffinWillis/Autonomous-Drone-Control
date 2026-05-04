@@ -5,6 +5,7 @@ import logging
 from types import TracebackType
 
 from mavsdk import System
+from mavsdk.telemetry import LandedState
 
 logger = logging.getLogger(__name__)
 
@@ -65,11 +66,25 @@ class FlightController:
         logger.info("Landing...")
         await self._drone.action.land()
 
+    async def wait_for_landed(self) -> None:
+        async for state in self._drone.telemetry.landed_state():
+            if state == LandedState.ON_GROUND:
+                logger.info("Drone on ground")
+                return
+
+    async def disarm(self) -> None:
+        logger.info("Disarming...")
+        await self._drone.action.disarm()
+
     async def run_demo_flight(self) -> None:
         await self.wait_until_ready()
         await self.arm()
+        logger.info("Drone is armed")
         await self.takeoff(TAKEOFF_ALTITUDE_M)
         await self.wait_for_altitude(TAKEOFF_ALTITUDE_M)
         logger.info("Holding for %.0f s", HOLD_SECONDS)
         await asyncio.sleep(HOLD_SECONDS)
         await self.land()
+        await self.wait_for_landed()
+        await self.disarm()
+        logger.info("Drone is disarmed")
