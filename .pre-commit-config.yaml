@@ -20,4 +20,4 @@ repos:
     hooks:
       - id: mypy
         args: [--strict]
-        additional_dependencies: [types-requests==2.32.0.20240914, pytest]
+        additional_dependencies: [types-requests==2.32.0.20240914, pytest, mavsdk>=1.4.4]

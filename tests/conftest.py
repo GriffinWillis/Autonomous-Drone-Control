@@ -1,6 +1,1 @@
-import pytest
-
-
-@pytest.fixture()
-def expected_greeting() -> str:
-    return "Hello, production-ready world!\n"
+# pytest-asyncio is configured with asyncio_mode = "auto" in pyproject.toml

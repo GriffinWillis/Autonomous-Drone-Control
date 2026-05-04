@@ -1,20 +1,23 @@
 [project]
-name = "app"
+name = "drone-autonomy"
 version = "0.1.0"
-description = "Production-grade Python project"
+description = "Autonomous drone pipeline: perception, tracking, decision-making, and MAVLink control"
 authors = [
-    { name = "Your Name" }
+    { name = "Griff" }
 ]
 readme = "README.md"
 requires-python = ">=3.12"
 
 dependencies = [
-    "requests>=2.33.1",
+    "mavsdk>=1.4.4",
 ]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/app"]
 
 # ------------------------
 # Linting & Formatting (Ruff)
@@ -41,6 +44,10 @@ python_version = "3.12"
 strict = true
 mypy_path = "src"
 
+[[tool.mypy.overrides]]
+module = "mavsdk.*"
+ignore_missing_imports = true
+
 # ------------------------
 # Testing (pytest)
 # ------------------------
@@ -48,3 +55,4 @@ mypy_path = "src"
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-ra -q --strict-markers --cov=app --cov-report=term-missing --cov-fail-under=80"
+asyncio_mode = "auto"

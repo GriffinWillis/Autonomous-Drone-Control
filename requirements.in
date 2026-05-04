@@ -1,1 +1,1 @@
-requests>=2.33.1
+mavsdk>=1.4.4
