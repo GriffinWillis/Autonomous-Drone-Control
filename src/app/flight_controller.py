@@ -15,7 +15,7 @@ CONNECTION_TIMEOUT_S: float = 30.0
 
 
 class FlightController:
-    def __init__(self, connection_url: str = "udpin://0.0.0.0:14540") -> None:
+    def __init__(self, connection_url: str = "udpout://127.0.0.1:14541") -> None:
         self._url = connection_url
         self._drone = System()
 

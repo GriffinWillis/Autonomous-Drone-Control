@@ -6,7 +6,7 @@ from app.flight_controller import FlightController
 
 logger = logging.getLogger(__name__)
 
-_DEFAULT_CONNECTION = "udpin://0.0.0.0:14540"
+_DEFAULT_CONNECTION = "udpout://127.0.0.1:14541"
 
 
 async def _run() -> None:

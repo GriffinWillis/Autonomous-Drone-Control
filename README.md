@@ -22,6 +22,7 @@ Camera/Input → Perception → Tracking → Decision Layer → Control (MAVLink
 - Python 3.12+
 - [PX4-Autopilot](https://github.com/PX4/PX4-Autopilot) cloned alongside this repo
 - PX4 build dependencies installed (`~/PX4-Autopilot/Tools/setup/ubuntu.sh`)
+- Colosseum + Unreal Engine 5 on Windows (for simulation)
 
 ## Setup
 
@@ -32,27 +33,44 @@ pip install -r requirements-dev.txt
 pip install -e .
 ```
 
-## Running
+## Simulation Startup (Colosseum + PX4 SITL)
 
-**1. Start PX4 SITL** (in a separate terminal):
+Follow these steps in order every session.
+
+**1. Windows — Start Colosseum**
+
+Open UE5, load `C:\Dev\Colosseum\Unreal\Environments\BlocksV2\Blocks.uproject`, press Play.
+
+**2. WSL2 — Start PX4 SITL**
 
 ```bash
 cd ~/PX4-Autopilot
-make px4_sitl gz_x500 || sitl
+PX4_SIM_HOSTNAME=$(ip route show | grep default | awk '{print $3}') make px4_sitl none_iris
 ```
 
-**2. Run the autonomy stack:**
+Wait until the console shows `Ready for takeoff!`
+
+> `PX4_SIM_HOSTNAME` points PX4 at the Windows host IP so it can reach Colosseum over the WSL2 bridge. This IP changes on reboot, so the `$(...)` resolves it dynamically each time.
+
+**3. WSL2 — Open a MAVLink port for MAVSDK** (in the PX4 console)
+
+```
+mavlink start -x -u 14541 -r 4000000 -m onboard
+```
+
+> PX4's default onboard MAVLink instance (port 14580) is occupied by Colosseum. This opens a dedicated instance on port 14541 for MAVSDK.
+
+**4. WSL2 — Run the autonomy stack** (new terminal)
 
 ```bash
+cd ~/Drone
 source venv/bin/activate
 python -m app.main
 ```
 
-The default connection is `udpin://0.0.0.0:14540`. Override with an environment variable:
+The default connection is `udpout://127.0.0.1:14541`.
 
-```bash
-MAVSDK_CONNECTION=udpin://0.0.0.0:14540 python -m app.main
-```
+**Between runs:** `Ctrl+C` PX4, then repeat steps 2–4.
 
 ## Development
 
