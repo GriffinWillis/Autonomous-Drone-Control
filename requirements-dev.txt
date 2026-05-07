@@ -29,8 +29,6 @@ filelock==3.29.0
     #   cachecontrol
     #   python-discovery
     #   virtualenv
-html5lib==1.1
-    # via pip-audit
 identify==2.6.19
     # via pre-commit
 idna==3.13
@@ -60,12 +58,13 @@ packaging==26.2
     #   pytest
 pip-api==0.0.34
     # via pip-audit
-pip-audit==2.7.3
+pip-audit==2.10.0
     # via -r requirements-dev.in
 pip-requirements-parser==32.0.1
     # via pip-audit
 platformdirs==4.9.6
     # via
+    #   pip-audit
     #   python-discovery
     #   virtualenv
 pluggy==1.6.0
@@ -101,11 +100,11 @@ rich==15.0.0
     # via pip-audit
 ruff==0.6.9
     # via -r requirements-dev.in
-six==1.17.0
-    # via html5lib
 sortedcontainers==2.4.0
     # via cyclonedx-python-lib
-toml==0.10.2
+tomli==2.4.1
+    # via pip-audit
+tomli-w==1.2.0
     # via pip-audit
 typing-extensions==4.15.0
     # via
@@ -115,8 +114,6 @@ urllib3==2.6.3
     # via requests
 virtualenv==21.3.0
     # via pre-commit
-webencodings==0.5.1
-    # via html5lib
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
