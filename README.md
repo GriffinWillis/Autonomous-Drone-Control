@@ -44,33 +44,18 @@ Open UE5, load `C:\Dev\Colosseum\Unreal\Environments\BlocksV2\Blocks.uproject`, 
 **2. WSL2 — Start PX4 SITL**
 
 ```bash
-cd ~/PX4-Autopilot
-PX4_SIM_HOSTNAME=$(ip route show | grep default | awk '{print $3}') make px4_sitl none_iris
+make sim
 ```
 
 Wait until the console shows `Ready for takeoff!`
 
-> `PX4_SIM_HOSTNAME` points PX4 at the Windows host IP so it can reach Colosseum over the WSL2 bridge. This IP changes on reboot, so the `$(...)` resolves it dynamically each time.
-
-**3. WSL2 — Open a MAVLink port for MAVSDK** (in the PX4 console)
-
-```
-mavlink start -x -u 14541 -r 4000000 -m onboard
-```
-
-> PX4's default onboard MAVLink instance (port 14580) is occupied by Colosseum. This opens a dedicated instance on port 14541 for MAVSDK.
-
-**4. WSL2 — Run the autonomy stack** (new terminal)
+**3. WSL2 — Run the autonomy stack** (new terminal)
 
 ```bash
-cd ~/Drone
-source venv/bin/activate
-python -m app.main
+make run
 ```
 
-The default connection is `udpout://127.0.0.1:14541`.
-
-**Between runs:** `Ctrl+C` PX4, then repeat steps 2–4.
+**Between runs:** `Ctrl+C` PX4, then repeat steps 2–3.
 
 ## Development
 
