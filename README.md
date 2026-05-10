@@ -49,21 +49,31 @@ make -C ~/PX4-Autopilot px4_sitl gz_x500
 ./venv/bin/python -m app.main
 ```
 
-The default connection is `udpin://0.0.0.0:14540`. Override with:
+The server starts on `http://localhost:8000`. Interactive docs are available at `http://localhost:8000/docs`.
+
+**3. Connect to the drone:**
 
 ```bash
-MAVSDK_CONNECTION=udpin://0.0.0.0:14540 ./venv/bin/python -m app.main
+curl -X POST http://localhost:8000/connect \
+  -H "Content-Type: application/json" \
+  -d '{"url": "udpin://0.0.0.0:14540"}'
 ```
 
-**3. Open the GCS** at `http://localhost:8000` in your browser.
+Omit the body to use the default connection (`udpin://0.0.0.0:14540`), or override the default via the `MAVSDK_CONNECTION` env var.
 
-## GCS Features
+## API Endpoints
 
-- **Map view** — place and reorder waypoints by clicking on the map
-- **Mission control** — upload mission, start, pause, and cancel
-- **Loiter tasks** — command the drone to hold position or orbit a point
-- **RTL** — one-click return to launch
-- **Basic commands** — arm, takeoff, land
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/health` | Liveness check |
+| `POST` | `/connect` | Connect to drone (optional `url` body) |
+| `POST` | `/disconnect` | Disconnect and stop telemetry |
+| `POST` | `/arm` | Arm the drone |
+| `POST` | `/disarm` | Disarm the drone |
+| `POST` | `/takeoff` | Takeoff (`altitude_m` body, default 10 m) |
+| `POST` | `/land` | Land in place |
+| `POST` | `/rtl` | Return to launch |
+| `GET` | `/telemetry` | Poll latest telemetry snapshot |
 
 ## Development
 
@@ -79,7 +89,7 @@ MAVSDK_CONNECTION=udpin://0.0.0.0:14540 ./venv/bin/python -m app.main
 ## Roadmap
 
 - [x] Phase 1 — MAVLink control (arm, takeoff, hold, land)
-- [ ] Phase 2 — REST API backend wrapping MAVSDK
+- [x] Phase 2 — REST API backend wrapping MAVSDK
 - [ ] Phase 3 — Web GCS frontend with interactive map
 - [ ] Phase 4 — Waypoint mission planning and upload
 - [ ] Phase 5 — Loiter, RTL, and additional mission types
