@@ -76,6 +76,17 @@ class FlightController:
         logger.info("Disarming...")
         await self._drone.action.disarm()
 
+    async def rtl(self) -> None:
+        logger.info("Return to launch...")
+        await self._drone.action.return_to_launch()
+
+    @property
+    def drone(self) -> System:
+        return self._drone
+
+    def set_connection_url(self, url: str) -> None:
+        self._url = url
+
     async def run_demo_flight(self) -> None:
         await self.wait_until_ready()
         await self.arm()

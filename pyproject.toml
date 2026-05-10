@@ -10,6 +10,8 @@ requires-python = ">=3.12"
 
 dependencies = [
     "mavsdk>=1.4.4",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
 ]
 
 [build-system]
@@ -46,6 +48,10 @@ mypy_path = "src"
 
 [[tool.mypy.overrides]]
 module = "mavsdk.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "uvicorn.*"
 ignore_missing_imports = true
 
 # ------------------------

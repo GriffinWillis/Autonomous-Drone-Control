@@ -1,18 +1,9 @@
-import asyncio
+from __future__ import annotations
+
 import logging
 import os
 
-from app.flight_controller import FlightController
-
-logger = logging.getLogger(__name__)
-
-_DEFAULT_CONNECTION = "udpin://0.0.0.0:14540"
-
-
-async def _run() -> None:
-    url = os.environ.get("MAVSDK_CONNECTION", _DEFAULT_CONNECTION)
-    async with FlightController(url) as fc:
-        await fc.run_demo_flight()
+import uvicorn
 
 
 def main() -> None:
@@ -20,7 +11,13 @@ def main() -> None:
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
-    asyncio.run(_run())
+    uvicorn.run(
+        "app.api:app",
+        host=os.environ.get("HOST", "0.0.0.0"),
+        port=int(os.environ.get("PORT", "8000")),
+        log_level="info",
+        reload=False,
+    )
 
 
 if __name__ == "__main__":
