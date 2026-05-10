@@ -1,20 +1,21 @@
-# Drone Autonomy Prototype
+# Drone GCS — Flight Control & Mission Planning
 
-An end-to-end autonomous drone pipeline built in simulation, targeting real hardware deployment. Integrates perception, tracking, decision-making, and MAVLink control into a closed-loop autonomy stack.
+A web-based Ground Control Station (GCS) for autonomous drone missions, built on PX4 + MAVSDK. Plan waypoint missions on an interactive map and execute them via a REST API connected to the flight computer.
+
+> **Perception/object detection is handled in a separate project.** This repo focuses purely on flight control and mission planning.
 
 ## Architecture
 
 ```
-Camera/Input → Perception → Tracking → Decision Layer → Control (MAVLink)
+Web GCS (browser) → REST API (Python backend) → MAVSDK → PX4 (SITL / hardware)
 ```
 
 | Component | Technology |
 |-----------|------------|
 | Flight stack | PX4 SITL → real hardware |
 | MAVLink control | MAVSDK (Python) |
-| Perception | YOLOv8 (Ultralytics) |
-| Tracking | YOLO built-in / ByteTrack |
-| Decision logic | Rule-based state machine |
+| API backend | Python (FastAPI) |
+| Web frontend | Map-centric UI (Leaflet / MapLibre) |
 
 ## Prerequisites
 
@@ -42,7 +43,7 @@ make -C ~/PX4-Autopilot px4_sitl gz_x500
 
 > Shortcut: if you have the `sitl` alias in your `~/.bashrc`, just run `sitl`.
 
-**2. Run the autonomy stack:**
+**2. Start the API backend:**
 
 ```bash
 ./venv/bin/python -m app.main
@@ -53,6 +54,16 @@ The default connection is `udpin://0.0.0.0:14540`. Override with:
 ```bash
 MAVSDK_CONNECTION=udpin://0.0.0.0:14540 ./venv/bin/python -m app.main
 ```
+
+**3. Open the GCS** at `http://localhost:8000` in your browser.
+
+## GCS Features
+
+- **Map view** — place and reorder waypoints by clicking on the map
+- **Mission control** — upload mission, start, pause, and cancel
+- **Loiter tasks** — command the drone to hold position or orbit a point
+- **RTL** — one-click return to launch
+- **Basic commands** — arm, takeoff, land
 
 ## Development
 
@@ -68,11 +79,11 @@ MAVSDK_CONNECTION=udpin://0.0.0.0:14540 ./venv/bin/python -m app.main
 ## Roadmap
 
 - [x] Phase 1 — MAVLink control (arm, takeoff, hold, land)
-- [ ] Phase 2 — YOLOv8 perception on video input
-- [ ] Phase 3 — Persistent object tracking with IDs
-- [ ] Phase 4 — Integrated perception + control loop
-- [ ] Phase 5 — Rule-based decision logic (track, search, idle states)
-- [ ] Phase 6 — Simulated geolocation / target GPS approximation
+- [ ] Phase 2 — REST API backend wrapping MAVSDK
+- [ ] Phase 3 — Web GCS frontend with interactive map
+- [ ] Phase 4 — Waypoint mission planning and upload
+- [ ] Phase 5 — Loiter, RTL, and additional mission types
+- [ ] Phase 6 — Real hardware support and field testing
 
 ## Dependencies
 
